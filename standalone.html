@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventPulse - Simple Standalone Event Management System</title>
+  
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel Compiler CDN for inline JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --font-family: 'Plus Jakarta Sans', sans-serif;
+      --bg-main: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #eef2ff;
+      --border-color: #e2e8f0;
+      --accent-green: #10b981;
+      --accent-green-bg: #ecfdf5;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: var(--bg-main); color: var(--text-main); padding: 1.5rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .navbar { display: flex; align-items: center; justify-content: space-between; background: #fff; padding: 1rem 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); margin-bottom: 1.5rem; }
+    .brand { font-size: 1.35rem; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
+    .btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1rem; border-radius: var(--radius-md); font-weight: 600; font-size: 0.9rem; cursor: pointer; border: 1px solid transparent; }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-secondary { background: var(--bg-subtle); color: var(--text-main); border-color: var(--border-color); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+    .card { background: #fff; border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; }
+    .card-img { width: 100%; height: 160px; object-fit: cover; }
+    .card-body { padding: 1.25rem; display: flex; flex-direction: column; flex: 1; }
+    .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .card-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; flex: 1; }
+    .badge { padding: 0.2rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: var(--primary-light); color: var(--primary); width: fit-content; margin-bottom: 0.5rem; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal { background: #fff; padding: 1.5rem; border-radius: var(--radius-lg); max-width: 500px; width: 100%; }
+    .form-input { width: 100%; padding: 0.6rem; margin-top: 0.3rem; margin-bottom: 0.8rem; border: 1px solid var(--border-color); border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const initialEvents = [
+      { id: 1, title: "Global Tech Innovation Summit 2026", category: "Tech", date: "Sep 15, 2026", location: "San Francisco & Online", price: "$199", image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80", desc: "Join tech leaders to explore AI and cloud architecture." },
+      { id: 2, title: "Indie Music Sunset Festival", category: "Music", date: "Sep 22, 2026", location: "Riverside Park", price: "$45", image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80", desc: "Acoustic sets, food trucks, and live indie artists." },
+      { id: 3, title: "Product Design & UX Masterclass", category: "Workshop", date: "Sep 28, 2026", location: "Metropolis Studio B", price: "Free", image: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=800&q=80", desc: "Hands-on UI design systems and Figma lab." }
+    ];
+
+    function App() {
+      const [events, setEvents] = React.useState(initialEvents);
+      const [tickets, setTickets] = React.useState([]);
+      const [showCreate, setShowCreate] = React.useState(false);
+      const [showRSVP, setShowRSVP] = React.useState(null);
+      const [attendeeName, setAttendeeName] = React.useState('');
+
+      const handleBook = (e) => {
+        e.preventDefault();
+        if (!attendeeName) return;
+        const newTicket = { id: `TCK-${Math.floor(Math.random()*90000)}`, eventTitle: showRSVP.title, attendeeName };
+        setTickets([...tickets, newTicket]);
+        setShowRSVP(null);
+        setAttendeeName('');
+        alert(`🎉 Pass Confirmed for ${newTicket.eventTitle}! Ticket ID: ${newTicket.id}`);
+      };
+
+      return (
+        <div className="container">
+          <div className="navbar">
+            <div className="brand">📅 EventPulse Standalone</div>
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button className="btn btn-secondary" onClick={() => alert(`You have ${tickets.length} booked pass(es).`)}>
+                🎟️ My Tickets ({tickets.length})
+              </button>
+            </div>
+          </div>
+
+          <h2 style={{ marginBottom: '1rem', fontSize: '1.4rem' }}>Upcoming Events</h2>
+
+          <div className="grid">
+            {events.map(evt => (
+              <div key={evt.id} className="card">
+                <img src={evt.image} className="card-img" alt={evt.title} />
+                <div className="card-body">
+                  <span className="badge">{evt.category} • {evt.price}</span>
+                  <div className="card-title">{evt.title}</div>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, marginBottom: '0.4rem' }}>{evt.date} • {evt.location}</div>
+                  <div className="card-desc">{evt.desc}</div>
+                  <button className="btn btn-primary" onClick={() => setShowRSVP(evt)}>
+                    Book Ticket
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {showRSVP && (
+            <div className="modal-bg" onClick={() => setShowRSVP(null)}>
+              <div className="modal" onClick={e => e.stopPropagation()}>
+                <h3 style={{ marginBottom: '0.5rem' }}>Book Ticket: {showRSVP.title}</h3>
+                <form onSubmit={handleBook}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Your Name</label>
+                  <input 
+                    className="form-input" 
+                    placeholder="Enter your name" 
+                    required 
+                    value={attendeeName} 
+                    onChange={e => setAttendeeName(e.target.value)} 
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '1rem' }}>
+                    <button type="button" className="btn btn-secondary" onClick={() => setShowRSVP(null)}>Cancel</button>
+                    <button type="submit" className="btn btn-primary">Confirm Pass</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
